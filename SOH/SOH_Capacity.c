@@ -1,15 +1,12 @@
-#include<stdio.h>
+#include <stdio.h>
 
-double Current_Capacity(double original_Capacity, double *currentMeasurements, int numMeasurements, double measurementInterval) {
-    double dischargedCoulombs = 0.0;
+// 충전 데이터 배열을 사용하여 최종 충전량을 계산하고 SOH 계산
+double SOH_Capacity(double original_Capacity, double charged_Data[]) {
+    double accumulated_Capacity = 0.0;
 
-    for (int i = 0; i < numMeasurements; ++i) {
-        dischargedCoulombs += currentMeasurements[i] * measurementInterval;
+    for (int i = 0; i < 100; ++i) {
+        accumulated_Capacity += charged_Data[i];
     }
 
-    double currentCapacity = original_Capacity - (dischargedCoulombs / 3600.0); // 쿨롱을 아워로 변환
-    if (currentCapacity < 0) {
-        currentCapacity = 0;
-    }
-    return currentCapacity;
+    return accumulated_Capacity;
 }
