@@ -6,8 +6,8 @@ double Current_Capacity_Resistance(double originalResistance, double currentResi
     }
 
     double degradationFactor = (currentResistance - originalResistance) / originalResistance;
-    double currentCapacity =  (1 - degradationFactor);
-    printf("In func %f\n",currentCapacity);
+    double currentCapacity =  (1 - degradationFactor) * 100;
+
     if (currentCapacity < 0) {
         currentCapacity = 0;
     }
