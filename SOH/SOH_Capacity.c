@@ -1,12 +1,16 @@
 #include <stdio.h>
 
-// 충전 데이터 배열을 사용하여 최종 충전량을 계산하고 SOH 계산
-double SOH_Capacity(double original_Capacity, double charged_Data[]) {
-    double accumulated_Capacity = 0.0;
-
-    for (int i = 0; i < 100; ++i) {
-        accumulated_Capacity += charged_Data[i];
+// 임피던스 계산을 통한 SOH 추정 함수
+double SOH_Impedance(double initialImpedance, double measuredVoltage, double measuredCurrent) {
+    if (measuredCurrent == 0) {
+        fprintf(stderr, "Error: Current measurement cannot be zero.\n");
+        return -1;  // 전류가 0이면 에러 반환
     }
 
-    return accumulated_Capacity;
+    double currentImpedance = measuredVoltage / measuredCurrent;
+    double impedanceIncrease = (currentImpedance - initialImpedance) / initialImpedance;
+    double soh = (1.0 - impedanceIncrease) * 100;
+
+    if (soh < 0) soh = 0;  // SOH가 0보다 작으면 0으로 설정
+    return soh;
 }
