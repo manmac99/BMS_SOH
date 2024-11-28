@@ -1,7 +1,8 @@
-#include "SOH\SOH_Capacity.c"
-#include"SOH\SOH_Resistance.c"
-#include"SOH\SOH.c"
-#include"SOH\SOH_Self_Discharge.c"
+// #include "SOH/SOH_Capacity.c"
+// #include"SOH/SOH_Resistance.c"
+// #include"SOH/SOH.c"
+// #include"SOH/SOH_Self_Discharge.c"
+#include "SOH/SOH.h"
 #include<stdio.h>
 
 int main() {
