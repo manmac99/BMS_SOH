@@ -1,10 +1,11 @@
 #ifndef SOH_H
 #define SOH_H
 
-#include "SOH_Cycle.c"
+#include "SOH_Kalman.c"
 #include "SOH.c"
 
-double SOH_Cycle(int max_Cycles, int current_Cycles);
+void kalman_init(KalmanFilter* kf, double init_estimate, double init_error_cov, double process_noise, double measurement_noise);
+void kalman_update(KalmanFilter* kf, double measurement);
 double SOH(double original_Capacity, double current_Capacity);
 
 #endif 

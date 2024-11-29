@@ -2,10 +2,13 @@
 #include <stdio.h>
 
 int main() {
-    int max_Cycles = 1000; // 예시 최대 충전/방전 사이클 수
-    int current_Cycles = 300; // 현재 사이클 수
+    KalmanFilter kf;
+    double initial_estimate = 100.0;  // 예를 들어, 배터리의 초기 SOH를 100%라고 가정
+    kalman_init(&kf, initial_estimate, 1.0, 0.1, 0.1);
+    printf("Original Kalman Filter Based SOH : %.2f%%\n", kf.estimate);
 
-    double soh = SOH_Cycle(max_Cycles, current_Cycles);
-    printf("Cycle Based SOH: %.2f%%\n", soh);
+    double new_measurement = 98.0;  // 새로운 측정값
+    kalman_update(&kf, new_measurement);
+    printf("Updated Kalman Filter Based SOH : %.2f%%\n", kf.estimate);
     return 0;
 }
