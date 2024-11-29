@@ -15,8 +15,7 @@ double SOH_Resistance(double original_Resistance, double current_Resistance[]) {
         weight_Sum += weights[i];
     }
 
-    double average_Degradation = Sum / weight_Sum;
-    double current_SOH = (1 - average_Degradation) * 100;
+    double current_SOH = (1 - Sum / weight_Sum) * 100;
 
     if (current_SOH < 0) {
         current_SOH = 0;

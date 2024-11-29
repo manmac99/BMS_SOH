@@ -33,7 +33,7 @@ int main() {
     printf("2. 저항 기반 로직\n");
     printf("--------------------------------------------------------------------\n");
     double originalResistance = 0.005;  // 초기 저항값
-    double currentResistances[3] = {0.0055, 0.006, 0.007};  // SOC 범위별 현재 저항값
+    double currentResistances[3] = {0.0055, 0.006, 0.007};  // SOC 범위별 현재 저항값, SOC를 1~20, 21~80, 81~100 구간으로 계산
 
     // 개선된 저항 기반 SOH 계산
     double SOH_Resis = SOH_Resistance(originalResistance, currentResistances);
@@ -49,9 +49,8 @@ int main() {
 
     double initial_Impedance = 0.010; // 초기 임피던스, Ohms
     double impedance_Measurements[3] = {0.011, 0.012, 0.013}; // 구간별 임피던스 측정값, Ohms
-    double weights[3] = {0.2, 0.6, 0.2}; // 각 구간별 가중치
-
-    double SOH_Impe = SOH_Impedance(initial_Impedance, impedance_Measurements, weights);
+    
+    double SOH_Impe = SOH_Impedance(initial_Impedance, impedance_Measurements);
     printf("Impedence Based SOH: %.2f%%\n", SOH_Impe);
 
     printf("--------------------------------------------------------------------\n\n");
@@ -73,7 +72,7 @@ int main() {
 
     //복구 임피던스 기반 로직
     //--------------------------------------------------------------------
-    printf("4. Recovery 기반 로직\n");
+    printf("5. Recovery 기반 로직\n");
     printf("--------------------------------------------------------------------\n");
 
     double V_loaded = 3.2;       // 부하 적용 중의 전압 (Volts)

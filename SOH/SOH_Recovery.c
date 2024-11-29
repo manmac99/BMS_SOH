@@ -3,8 +3,7 @@
 // 전압 복구 테스트 기반 SOH 계산 함수
 double SOH_Recovery(double V_recovered, double V_loaded, double V_nominal) {
     if (V_nominal == V_loaded) {
-        fprintf(stderr, "Error: V_nominal and V_loaded cannot be the same to avoid division by zero.\n");
-        return -1;
+        return 0;
     }
 
     double soh = ((V_recovered - V_loaded) / (V_nominal - V_loaded)) * 100;
