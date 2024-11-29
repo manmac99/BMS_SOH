@@ -4,7 +4,7 @@
 #include "SOH_Impedance.c"
 #include "SOH.c"
 
-double SOH_Impedance(double initial_Impedance, double impedance_Measurements[], double weights[]);
+double SOH_Impedance(double initial_Impedance, double impedance_Measurements[]);
 double SOH(double original_Capacity, double current_Capacity);
 
 #endif 
