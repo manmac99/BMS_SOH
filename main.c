@@ -1,68 +1,32 @@
 #include <stdio.h>
-
-// 배터리 관련 상수
-const float nominalTotalCapacity = 6.0;  // Ah, 배터리의 명목 전류 용량
-float remainingCapacity = 6.0;           // Ah, 초기 남은 배터리 용량
-float soh = 100.0;                       // 초기 SOH 100%
-
-// 시뮬레이션 변수
-float dischargeRate = 0.5;  // A, 배터리 방전 전류
-float chargeRate = 0.5;     // A, 배터리 충전 전류
-float chargeTime = 0.0;     // h, 정전압 충전에 걸린 시간
-float elapsedHours = 0.0;   // h, 전체 적산된 시간
-
-void updateSOH() {
-    soh = (remainingCapacity / nominalTotalCapacity) * 100.0;
-    printf("Updated SOH: %.2f%%\n", soh);
-}
-
-void dischargeBattery(float current, float hours) {
-    float discharged = current * hours;
-    if (remainingCapacity > discharged) {
-        remainingCapacity -= discharged;
-        printf("Discharged: %.2fAh, Remaining Capacity: %.2fAh\n", discharged, remainingCapacity);
-    } else {
-        printf("Battery fully discharged.\n");
-        remainingCapacity = 0;
-    }
-    updateSOH();
-}
-
-void chargeBattery(float current, float hours) {
-    float charged = current * hours;
-    if (remainingCapacity + charged <= nominalTotalCapacity) {
-        remainingCapacity += charged;
-        printf("Charged: %.2fAh, Remaining Capacity: %.2fAh\n", charged, remainingCapacity);
-    } else {
-        printf("Battery fully charged.\n");
-        remainingCapacity = nominalTotalCapacity;
-    }
-    updateSOH();
-    chargeTime += hours;  // 정전압 충전 시간을 충전 시간으로 간주
-}
-
-void adjustSOHBasedOnChargeTime() {
-    // 정전압 충전 시간에 따른 SOH 감소를 조정
-    float sohDecrease = chargeTime * 2.0;  // 가정: 충전 시간에 비례하여 SOH가 감소
-    soh -= sohDecrease;
-    if (soh < 0) soh = 0;
-    printf("Adjusted SOH after CV charge: %.2f%%\n", soh);
-    chargeTime = 0.0;  // 충전 시간 초기화
-}
+#include"SOH/SOH.h"
 
 int main() {
-    for (int i = 0; i < 3; i++) {
-        printf("\nCycle %d:\n", i + 1);
+    // 배터리 변수
+    const double nominal_Capacity = 6.0;  // Ah, 배터리의 명목 전류 용량
+    double remain_Capacity = 6.0;           // Ah, 초기 남은 배터리 용량
+    double CC_CV_Based_SOH = 100.0;                       // 초기 SOH 100%
+    double original_CV = 10.0; //초기 정전압
+
+    // 시뮬레이션 변수
+    double dischargeRate = 0.5;  // A, 배터리 방전 전류
+    double chargeRate = 0.35;     // A, 배터리 충전 전류
+    double charge_Time = 0.0;     // h, 정전압 충전에 걸린 시간
+    double estimated_CV = 0.5;   // h, 전체 적산된 시간
         
-        // 1시간 동안 방전
-        dischargeBattery(dischargeRate, 1.0);
-        
-        // 1시간 동안 충전
-        chargeBattery(chargeRate, 1.0);
-        
-        // SOH 보정
-        adjustSOHBasedOnChargeTime();
-    }
+    // 1시간 동안 방전
+    discharge_Battery(&remain_Capacity, dischargeRate, 1.0);
+    CC_CV_Based_SOH = SOH(nominal_Capacity, remain_Capacity);
+    printf("Updated SOH: %.2f%%\n\n", CC_CV_Based_SOH);
+
+    // 1시간 동안 충전
+    charge_Battery(&remain_Capacity, &charge_Time,nominal_Capacity, chargeRate, 1.0);
+    CC_CV_Based_SOH = SOH(nominal_Capacity, remain_Capacity);
+    printf("Updated SOH: %.2f%%\n\n", CC_CV_Based_SOH);
+
+    // SOH 보정
+    adjust_SOH(&CC_CV_Based_SOH, Calc_CV(estimated_CV, original_CV));
+    printf("Adjusted SOH after CV charge: %.2f%%\n", CC_CV_Based_SOH);
 
     return 0;
 }

@@ -1,11 +1,13 @@
 #ifndef SOH_H
 #define SOH_H
 
-#include "SOH_Kalman.c"
+#include "SOH_CC_CV.c"
 #include "SOH.c"
 
-void kalman_init(KalmanFilter* kf, double init_estimate, double init_error_cov, double process_noise, double measurement_noise);
-void kalman_update(KalmanFilter* kf, double measurement);
+void discharge_Battery(double *remain_Capacity, double current, double hours);
+void charge_Battery(double *remain_Capacity, double *charge_Time, double nominal_Capacity, double current, double hours);
+double Calc_CV(double esitmated_CV, double original_CV);
+void adjust_SOH(double *soh,  double calculated_CV);
 double SOH(double original_Capacity, double current_Capacity);
 
 #endif 
