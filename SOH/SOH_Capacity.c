@@ -1,12 +1,9 @@
-#include <stdio.h>
+#include<stdio.h>
 
-// 충전 데이터 배열을 사용하여 최종 충전량을 계산하고 SOH 계산
-double SOH_Capacity(double original_Capacity, double charged_Data[]) {
-    double accumulated_Capacity = 0.0;
-
-    for (int i = 0; i < 100; ++i) {
-        accumulated_Capacity += charged_Data[i];
+double SOH_Capacity(double original_Capacity, double current_Capacity) {
+    if (original_Capacity == 0) {
+        return 100.0; // 원래 용량이 0이면, 계산 불가
     }
-
-    return accumulated_Capacity;
+    double soh = (current_Capacity / original_Capacity) * 100.0;
+    return soh;
 }

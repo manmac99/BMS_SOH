@@ -4,14 +4,14 @@ void discharge_Battery(double *remain_Capacity, double current, double hours) {
     double discharged = current * hours;
     if (*remain_Capacity > discharged) {
         *remain_Capacity -= discharged;
-        printf("Discharged: %.2fAh, Remaining Capacity: %.2fAh\n", discharged, remain_Capacity);
+        printf("Discharged: %.2fAh, Remaining Capacity: %.2fAh\n", discharged, *remain_Capacity);
     } else {
         printf("Battery fully discharged.\n");
         remain_Capacity = 0;
     }
 }
 
-void charge_Battery(double *remain_Capacity, double *charge_Time, double nominal_Capacity, double current, double hours) {
+void charge_Battery(double *remain_Capacity, double nominal_Capacity, double current, double hours) {
     double charged = current * hours;
     if (*remain_Capacity + charged <= nominal_Capacity) {
         *remain_Capacity += charged;
@@ -20,11 +20,10 @@ void charge_Battery(double *remain_Capacity, double *charge_Time, double nominal
         printf("Battery fully charged.\n");
         *remain_Capacity = nominal_Capacity;
     }
-    *charge_Time += hours;  // 정전압 충전 시간을 충전 시간으로 간주
 }
 
-double Calc_CV(double esitmated_CV, double original_CV){
-    return 1-(original_CV-esitmated_CV)/original_CV;
+double Calc_CV(double esitmated, double original){
+    return 1-(esitmated-original)/original;
 }
 
 void adjust_SOH(double *soh,  double calculated_CV) {

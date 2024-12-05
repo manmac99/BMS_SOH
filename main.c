@@ -6,22 +6,14 @@ int main() {
     //--------------------------------------------------------------------
     printf("1. 용량 기반 로직\n");
     printf("--------------------------------------------------------------------\n");
-    double original_Capacity = 38500.0;  // 배터리의 원래 총 용량 설정
-    double charged_Data[100];             // 1%부터 100%까지의 충전 데이터 저장 배열
-    double charged_Rate = 384;  // 각 1%당 충전되는 양
+    double charge_Ampere = 500.0; //Ah
+    double battery_Capacity = 38500.0; //Ah
+    double original_Charge_Time = battery_Capacity/charge_Ampere; //77
 
-    //용량 기반 계산
-    // 충전 데이터 배열 채우기, 임의의 값 384로 채우기
-    for (int i = 0; i < 100; i++) {charged_Data[i] = charged_Rate;}
+    double estimated_Charge_Time = 75;
+    double current_Capacity = charge_Ampere * estimated_Charge_Time;
 
-    // 현재 총 Capacity 계산
-    double Current_Capacity = SOH_Capacity(original_Capacity, charged_Data);
-
-    //SOH 계산
-    double SOH_Capa = SOH(original_Capacity, Current_Capacity);
-
-    //총 Capacity 출력
-    printf("Final Accumulated Capacity: %.2f Ah\n", Current_Capacity);
+    double SOH_Capa = SOH_Capacity(battery_Capacity, current_Capacity);
 
     //용량 기반 SOH 출력
     printf("SOH (Capacity-Based): %.2f%%\n", SOH_Capa);
@@ -32,8 +24,8 @@ int main() {
     //--------------------------------------------------------------------
     printf("2. 저항 기반 로직\n");
     printf("--------------------------------------------------------------------\n");
-    double originalResistance = 0.005;  // 초기 저항값
-    double currentResistances[3] = {0.0055, 0.006, 0.007};  // SOC 범위별 현재 저항값, SOC를 1~20, 21~80, 81~100 구간으로 계산
+    double originalResistance[3] = {0.005, 0.005, 0.0065};  // 초기 저항값
+    double currentResistances[3] = {0.0055, 0.006, 0.007};  // SOC 범위별 현재 저항값
 
     // 개선된 저항 기반 SOH 계산
     double SOH_Resis = SOH_Resistance(originalResistance, currentResistances);
@@ -47,10 +39,11 @@ int main() {
     printf("3. 내부 임피던스 기반 로직\n");
     printf("--------------------------------------------------------------------\n");
 
-    double initial_Impedance = 0.010; // 초기 임피던스, Ohms
+    double initial_Impedance[3] = {0.010, 0.012, 0.012}; // 초기 임피던스, Ohms
     double impedance_Measurements[3] = {0.011, 0.012, 0.013}; // 구간별 임피던스 측정값, Ohms
-    
-    double SOH_Impe = SOH_Impedance(initial_Impedance, impedance_Measurements);
+    double weights[3] = {0.2, 0.6, 0.2}; // 각 구간별 가중치
+
+    double SOH_Impe = SOH_Impedance(initial_Impedance, impedance_Measurements, weights);
     printf("Impedence Based SOH: %.2f%%\n", SOH_Impe);
 
     printf("--------------------------------------------------------------------\n\n");
@@ -91,29 +84,35 @@ int main() {
     printf("6. CC-CV 기반 로직\n");
     printf("--------------------------------------------------------------------\n");
 
-    const double nominal_Capacity = 6.0;  // Ah, 배터리의 명목 전류 용량
-    double remain_Capacity = 6.0;           // Ah, 초기 남은 배터리 용량
-    double CC_CV_Based_SOH = 100.0;                       // 초기 SOH 100%
-    double original_CV = 10.0; //초기 정전압
+    // 배터리 변수
+    const double nominal_Capacity = 385.0;  // Ah, 배터리의 명목 전류 용량
+    double remain_Capacity = 385.0; // Ah, 초기 남은 배터리 용량
+    double CC_CV_Based_SOH = 100.0; // 초기 SOH 100%
+    double original_CV_Period = 10.0; //정전압이 돌아오는 시간, 초기값
+
 
     // 시뮬레이션 변수
-    double dischargeRate = 0.5;  // A, 배터리 방전 전류
-    double chargeRate = 0.35;     // A, 배터리 충전 전류
-    double charge_Time = 0.0;     // h, 정전압 충전에 걸린 시간
-    double estimated_CV = 0.5;   // h, 전체 적산된 시간
+    double discharge_Rate = 12; // A, 배터리 방전 전류
+    double charge_Rate = 9.06; // A, 배터리 충전 전류, 시간이 지난 후.
+    double estimated_CV_Period = 9.54; //측정된 정전압이 돌아오는 시간
+    const double charge_per_hour = 10; // 1시간당 충전되는 배터리 전류, 배터리 초기 설정값
         
     // 1시간 동안 방전
-    discharge_Battery(&remain_Capacity, dischargeRate, 1.0);
-    CC_CV_Based_SOH = SOH(nominal_Capacity, remain_Capacity);
-    printf("Updated SOH: %.2f%%\n\n", CC_CV_Based_SOH);
+    discharge_Battery(&remain_Capacity, discharge_Rate, 1.0);
+    printf("Discharged SOC: %.2f%%\n\n", SOH(nominal_Capacity, remain_Capacity));
 
-    // 1시간 동안 충전
-    charge_Battery(&remain_Capacity, &charge_Time,nominal_Capacity, chargeRate, 1.0);
-    CC_CV_Based_SOH = SOH(nominal_Capacity, remain_Capacity);
-    printf("Updated SOH: %.2f%%\n\n", CC_CV_Based_SOH);
+    // 1시간 동안 충전 후 SOH계산
+    double prev_Capacity = remain_Capacity+charge_per_hour; //정상적으로 1시간 충전이 되었다면 나올 Capacity
+    charge_Battery(&remain_Capacity,nominal_Capacity, charge_Rate, 1.0); 
+    double updated_Capacity = remain_Capacity; //현재 충전량으로 계산된 Capacity
 
-    // SOH 보정
-    adjust_SOH(&CC_CV_Based_SOH, Calc_CV(estimated_CV, original_CV));
+    printf("Discharged SOC: %.2f%%\n\n", SOH(nominal_Capacity, remain_Capacity));
+    CC_CV_Based_SOH = (1 - (prev_Capacity-updated_Capacity)/updated_Capacity)*100;
+
+    printf("First esimated SOH: %.2f%%\n\n", CC_CV_Based_SOH);
+
+    //정전압이 돌아온 시간을 기준으로 다시 한번 계산
+    adjust_SOH(&CC_CV_Based_SOH, Calc_CV(estimated_CV_Period, original_CV_Period));
     printf("Adjusted SOH after CV charge: %.2f%%\n", CC_CV_Based_SOH);
 
     printf("--------------------------------------------------------------------\n\n");
