@@ -23,7 +23,6 @@ void charge_Battery(double *remain_Capacity, double nominal_Capacity, double cur
 }
 
 double Calc_CV(double esitmated, double original){
-    printf("%f\n\n",1-(esitmated-original)/original);
     return 1-(esitmated-original)/original;
 }
 
