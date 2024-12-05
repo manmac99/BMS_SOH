@@ -1,24 +1,16 @@
 #include <stdio.h>
 
-double SOH_Impedance(double initial_Impedance, double impedance_Measurements[]) {
-    if(initial_Impedance == 0) {
-        return 0;  // 초기 저항이 0이면 계산 불가
-    }
-
+double SOH_Impedance(double initial_Impedance[], double impedance_Measurements[], double weights[]) {
     double Sum = 0.0;
-    double weight_Sum = 0.0;
-    double weights[] = {0.2, 0.6, 0.2}; // SOC 범위 1-20, 21-80, 81-100에 대한 가중치
+    double total_Weight = 0.0;
 
     for (int i = 0; i < 3 ; ++i) {
-        Sum += ((impedance_Measurements[i] - initial_Impedance) / initial_Impedance) * weights[i];
-        weight_Sum += weights[i];
+        Sum += ((impedance_Measurements[i] - initial_Impedance[0]) / initial_Impedance[0]) * weights[i];
+        total_Weight += weights[i];
     }
 
-    double current_SOH = (1 - Sum / weight_Sum) * 100;
+    double soh = (1.0 - Sum / total_Weight) * 100;
 
-    if (current_SOH < 0) {
-        current_SOH = 0;
-    }
-
-    return current_SOH;
+    if (soh < 0) soh = 0;  // 보정: SOH가 0보다 작으면 0으로 설정
+    return soh;
 }
