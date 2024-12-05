@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-double SOH_Impedance(double initial_Impedance, double impedance_Measurements[], double weights[]) {
+double SOH_Impedance(double initial_Impedance[], double impedance_Measurements[], double weights[]) {
     double Sum = 0.0;
     double total_Weight = 0.0;
 
     for (int i = 0; i < 3 ; ++i) {
-        Sum += ((impedance_Measurements[i] - initial_Impedance) / initial_Impedance) * weights[i];
+        Sum += ((impedance_Measurements[i] - initial_Impedance[0]) / initial_Impedance[0]) * weights[i];
         total_Weight += weights[i];
     }
 
