@@ -88,13 +88,13 @@ int main() {
     const double nominal_Capacity = 385.0;  // Ah, 배터리의 명목 전류 용량
     double remain_Capacity = 385.0; // Ah, 초기 남은 배터리 용량
     double CC_CV_Based_SOH = 100.0; // 초기 SOH 100%
-    double original_CV_Period = 10.0; //정전압이 돌아오는 시간, 초기값
+    double original_CV_Period = 10.0; //정전압이 유지되는 시간, 초기값
 
 
     // 시뮬레이션 변수
     double discharge_Rate = 12; // A, 배터리 방전 전류
     double charge_Rate = 9.06; // A, 배터리 충전 전류, 시간이 지난 후.
-    double estimated_CV_Period = 9.54; //측정된 정전압이 돌아오는 시간
+    double estimated_CV_Period = 9.54; //측정된 정전압이 유지되는 시간
     const double charge_per_hour = 10; // 1시간당 충전되는 배터리 전류, 배터리 초기 설정값
         
     // 1시간 동안 방전
